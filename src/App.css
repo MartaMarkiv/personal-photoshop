@@ -5,8 +5,13 @@
   text-align: center;
 }
 
+.instructions-container {
+  text-align: left;
+}
+
 .image-edit-container {
   position: relative;
+  margin-top: 30px;
 }
 
 .selected-image {
@@ -19,4 +24,31 @@
   top: 0;
   left: 0;
   cursor: crosshair;
+  opacity: 0.1;
+}
+
+
+.edit-btn-wrapper {
+  text-align: right;
+  margin-top: 30px;
+}
+
+.edit-button {
+  background-color: rgb(211, 104, 104);
+  font-size: 18px;
+  color: #ffffff;
+  text-transform: uppercase;
+  padding: 5px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: rgb(239, 114, 114);
+  transform: scale(1.05);
+}
+
+.result-container {
+  margin-top: 30px;
 }

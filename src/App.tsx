@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.css";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { sendEditRequest, sendEditReplicateRequest } from "./api/requests";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const [drawing, setDrawing] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [drawing, setDrawing] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedImage && imgRef.current && canvasRef.current) {
@@ -19,7 +24,13 @@ function App() {
       canvas.style.width = `${img.width}px`;
       canvas.style.height = `${img.height}px`;
 
-      ctxRef.current = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      ctxRef.current = ctx;
     }
   }, [selectedImage]);
 
@@ -47,7 +58,41 @@ function App() {
   };
 
   const handleEdit = async () => {
-    if (!selectedImage || !canvasRef.current) return;
+
+    if (!selectedImage || !canvasRef.current || !imageFile) return;
+    if(processing) {
+      setResult(null);
+      setSelectedImage(null);
+      return;
+    }
+
+    setProcessing(true);
+
+    try {
+
+      const maskBase64 = canvasRef.current.toDataURL("image/png");
+
+      // const response = await sendEditRequest(selectedImage, maskBase64);
+
+      // if (!response.ok) {
+      //   console.log(response);
+      //   return;
+      // }
+
+      // const blob = await response.blob();
+      // const url = URL.createObjectURL(blob);
+      // setResult(url);
+
+      const response = await sendEditReplicateRequest(selectedImage, maskBase64);
+      const data = await response.json();
+      setResult(data.output?.[0] || "");
+
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const uploadImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -56,15 +101,25 @@ function App() {
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result as string);
       reader.readAsDataURL(fileList[0]);
+      setImageFile(fileList[0]);
+      setResult(null);
     } else {
       setSelectedImage(null);
+      setImageFile(null);
     }
   };
 
   return (
     <>
       <h1>Personal photoshop</h1>
-      <p>Choose a picture to edit</p>
+      <div className="instructions-container">
+      <h3>Follow instructions below:</h3>
+      <ul>
+        <li>Choose a picture you want to edit.</li>
+        <li>Add a mask layer over the area you want to remove from the uploaded picture.</li>
+        <li>Press the 'Edit' button to see the result.</li>
+      </ul>
+      </div>
       <div>
         <input
           type="file"
@@ -91,11 +146,21 @@ function App() {
           />
         </div>
       )}
-      <div>
-        <button onClick={handleEdit} disabled={!selectedImage}>
+      <div className="edit-btn-wrapper">
+        <button onClick={handleEdit} disabled={!selectedImage || processing} className="edit-button">
           Edit
         </button>
       </div>
+      {result && (
+        <div className="result-container">
+          <h3>Result:</h3>
+          <img
+            src={result}
+            alt="result"
+            style={{ maxWidth: "100%", borderRadius: "8px" }}
+          />
+        </div>
+      )}
     </>
   );
 }
