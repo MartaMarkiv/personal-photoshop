@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.css";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { sendEditRequest, sendEditReplicateRequest } from "./api/requests";
+import { sendEditReplicateRequest } from "./api/requests";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
