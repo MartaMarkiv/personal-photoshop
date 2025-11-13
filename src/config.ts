@@ -3,4 +3,5 @@ export const HUGGINGFACE_API =
 
 export const REPLICATE_API = "https://api.replicate.com/v1/predictions";
 
-export const STABILITY_API = "https://api.stability.ai/v2beta/stable-image/edit/erase";
+export const STABILITY_API =
+  "https://api.stability.ai/v2beta/stable-image/edit/erase";

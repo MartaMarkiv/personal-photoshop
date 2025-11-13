@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.scss";
 import { sendEditStabilityRequest } from "./api/requests";
+import ImageEditor from "./components/imageEditor/ImageEditor";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -57,10 +58,9 @@ function App() {
   };
 
   const handleEdit = async () => {
-
     if (!selectedImage || !canvasRef.current || !imageFile) return;
 
-    if(processing) {
+    if (processing) {
       setResult(null);
       setSelectedImage(null);
       return;
@@ -69,15 +69,17 @@ function App() {
     setProcessing(true);
 
     try {
-
       const maskBlob = await new Promise<Blob>((resolve) =>
-        canvasRef.current!.toBlob((blob) => resolve(blob!), "image/png")
+        canvasRef.current!.toBlob((blob) => resolve(blob!), "image/png"),
       );
 
       const formData = new FormData();
       formData.append("image", imageFile);
       formData.append("mask", maskBlob, "mask.png");
-      formData.append("prompt", "Remove unwanted object and fill background naturally");
+      formData.append(
+        "prompt",
+        "Remove unwanted object and fill background naturally",
+      );
 
       const response = await sendEditStabilityRequest(formData);
 
@@ -90,7 +92,6 @@ function App() {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       setResult(url);
-
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -117,12 +118,15 @@ function App() {
     <>
       <h1>Personal photoshop</h1>
       <div className="instructions-container">
-      <h3>Follow instructions below:</h3>
-      <ul>
-        <li>Choose a picture you want to edit.</li>
-        <li>Add a mask layer over the area you want to remove from the uploaded picture.</li>
-        <li>Press the 'Edit' button to see the result.</li>
-      </ul>
+        <h3>Follow instructions below:</h3>
+        <ul>
+          <li>Choose a picture you want to edit.</li>
+          <li>
+            Add a mask layer over the area you want to remove from the uploaded
+            picture.
+          </li>
+          <li>Press the 'Edit' button to see the result.</li>
+        </ul>
       </div>
       <div>
         <input
@@ -134,34 +138,28 @@ function App() {
         />
       </div>
       {selectedImage && (
-        <div className="image-edit-container">
-          <img
-            ref={imgRef}
-            src={selectedImage}
-            alt="Selected image"
-            className="selected-image"
-          />
-          <canvas
-            ref={canvasRef}
-            className="masked-image"
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-          />
-        </div>
+        <ImageEditor
+          imageRef={imgRef}
+          imageUrl={selectedImage}
+          maskRef={canvasRef}
+          mouseDown={handleMouseDown}
+          mouseMove={handleMouseMove}
+          mouseUp={handleMouseUp}
+        />
       )}
       <div className="edit-btn-wrapper">
-        <button onClick={handleEdit} disabled={!selectedImage || processing} className="edit-button">
+        <button
+          onClick={handleEdit}
+          disabled={!selectedImage || processing}
+          className="edit-button"
+        >
           Edit
         </button>
       </div>
       {result && (
         <div className="result-container">
           <h3>Result:</h3>
-          <img
-            src={result}
-            alt="Updated image"
-          />
+          <img src={result} alt="Updated image" />
         </div>
       )}
     </>

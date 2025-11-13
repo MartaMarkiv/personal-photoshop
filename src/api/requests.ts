@@ -3,7 +3,6 @@ import { STABILITY_API } from "../config";
 export const sendEditStabilityRequest = async (
   formData: FormData,
 ): Promise<Response> => {
-  
   return await fetch(STABILITY_API, {
     method: "POST",
     headers: {

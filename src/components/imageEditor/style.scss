@@ -1,0 +1,17 @@
+.image-edit-container {
+  position: relative;
+  margin-top: 30px;
+
+  .selected-image {
+    max-width: 100%;
+    display: block;
+  }
+
+  .masked-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: crosshair;
+    opacity: 0.1;
+  }
+}
