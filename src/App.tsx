@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import "./App.css";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { sendEditReplicateRequest } from "./api/requests";
+import "./App.scss";
+import { sendEditStabilityRequest } from "./api/requests";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -60,6 +59,7 @@ function App() {
   const handleEdit = async () => {
 
     if (!selectedImage || !canvasRef.current || !imageFile) return;
+
     if(processing) {
       setResult(null);
       setSelectedImage(null);
@@ -70,22 +70,26 @@ function App() {
 
     try {
 
-      const maskBase64 = canvasRef.current.toDataURL("image/png");
+      const maskBlob = await new Promise<Blob>((resolve) =>
+        canvasRef.current!.toBlob((blob) => resolve(blob!), "image/png")
+      );
 
-      // const response = await sendEditRequest(selectedImage, maskBase64);
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      formData.append("mask", maskBlob, "mask.png");
+      formData.append("prompt", "Remove unwanted object and fill background naturally");
 
-      // if (!response.ok) {
-      //   console.log(response);
-      //   return;
-      // }
+      const response = await sendEditStabilityRequest(formData);
 
-      // const blob = await response.blob();
-      // const url = URL.createObjectURL(blob);
-      // setResult(url);
+      if (response.status !== 200) {
+        console.error(await response.text());
+        alert("Error from Stability API");
+        return;
+      }
 
-      const response = await sendEditReplicateRequest(selectedImage, maskBase64);
-      const data = await response.json();
-      setResult(data.output?.[0] || "");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setResult(url);
 
     } catch (err) {
       console.error(err);
@@ -156,8 +160,7 @@ function App() {
           <h3>Result:</h3>
           <img
             src={result}
-            alt="result"
-            style={{ maxWidth: "100%", borderRadius: "8px" }}
+            alt="Updated image"
           />
         </div>
       )}
