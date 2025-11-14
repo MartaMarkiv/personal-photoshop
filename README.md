@@ -1,7 +1,7 @@
-# Rersonal photoshop (Erase function)
+# Personal AI photoshop - Erase tool
 
 This project is a 1-page admin panel for editing images using AI inpainting.
-The tool allows the user to upload a picture, manually mark unwanted areas using a brush mask, and send the masked image to Stability AI for correction ("personal Photoshop").
+The tool allows the user to upload a picture, manually mark unwanted areas using a brush mask, and send the masked image to Stability AI for correction.
 
 Project includes:
 
@@ -12,26 +12,26 @@ Project includes:
 
 ## Installation & Setup
 
-1.  In your project, open terminal and enter (be sure to perform):
+1.  In your project, open terminal and enter:
 
-    - `git clone https://github.com/MartaMarkiv/personal-photoshop.git`
+    ``git clone https://github.com/MartaMarkiv/personal-photoshop.git``
 
-    - `cd personal-photoshop`
+    `cd personal-photoshop`
 
-    - `npm install` - install all package
+    `npm install` - install all packages
 
 2.  Add environment variables:
 
     Create .env file:
 
-    - `VITE_STABILITY_API_KEY=your_api_key`
+    `VITE_STABILITY_API_KEY=your_api_key`
 
 
 3.  Start development server:
 
-    - `npm run dev`
+    `npm run dev`
 
-    The project will be be available at http://localhost:5173
+    The project will be available at http://localhost:5173
 
 
 ## Notes
