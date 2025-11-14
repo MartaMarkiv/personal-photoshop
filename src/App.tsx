@@ -2,19 +2,23 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.scss";
 import { sendEditStabilityRequest } from "./api/requests";
 import ImageEditor from "./components/imageEditor/ImageEditor";
+import { Button } from "antd";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const imgRef = useRef<HTMLImageElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [drawing, setDrawing] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
 
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+
   useEffect(() => {
     if (selectedImage && imgRef.current && canvasRef.current) {
+      console.log("In use effect");
       const img = imgRef.current;
       const canvas = canvasRef.current;
 
@@ -102,6 +106,7 @@ function App() {
 
   const uploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
+    console.log(fileList);
     if (fileList) {
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result as string);
@@ -113,6 +118,15 @@ function App() {
       setImageFile(null);
     }
   };
+
+  const handleClearImage = () => {
+    setSelectedImage(null);
+    setResult(null);
+    setImageFile(null);
+    if(inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }
 
   return (
     <>
@@ -128,14 +142,14 @@ function App() {
           <li>Press the 'Edit' button to see the result.</li>
         </ul>
       </div>
-      <div>
-        <input
-          type="file"
-          title="Browse image"
-          placeholder="Upload image"
+      <div className="image-input-container">
+      <input type="file" title="Upload an image"
           onChange={uploadImage}
-          accept="image/*"
-        />
+          ref={inputRef}
+          className="image-input"
+          id="imageInput"
+          accept="image/*" />
+          <label htmlFor="imageInput" className="image-input-label">+ Select image</label>
       </div>
       {selectedImage && (
         <ImageEditor
@@ -148,13 +162,20 @@ function App() {
         />
       )}
       <div className="edit-btn-wrapper">
-        <button
+        <Button
+          onClick={handleClearImage}
+          disabled={!selectedImage || processing}
+          className="edit-button clear-button"
+        >
+          Clear image
+        </Button>
+        <Button
           onClick={handleEdit}
           disabled={!selectedImage || processing}
           className="edit-button"
         >
           Edit
-        </button>
+        </Button>
       </div>
       {result && (
         <div className="result-container">

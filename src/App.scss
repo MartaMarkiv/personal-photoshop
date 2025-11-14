@@ -10,7 +10,7 @@
 }
 
 .edit-btn-wrapper {
-  text-align: right;
+  text-align: left;
   margin-top: 30px;
 }
 
@@ -25,18 +25,41 @@
   cursor: pointer;
 
   &:disabled {
+    color: #d6d1d1;
     background-color: rgb(198, 154, 154);
     cursor: default;
 
     &:hover {
-      background-color: rgb(198, 154, 154);
+      color: #d6d1d1 !important;
+      background-color: rgb(198, 154, 154) !important;
       transform: none;
     }
   }
 
   &:hover {
-    background-color: rgb(239, 114, 114);
+    color: #fff !important;
+    background-color: rgb(239, 114, 114) !important;
     transform: scale(1.05);
+  }
+}
+
+.clear-button {
+  margin-right: 20px;
+}
+
+.image-input-container {
+  text-align: left;
+
+  .image-input {
+    display: none;
+  }
+
+  .image-input-label {
+    border: 1px solid grey;
+    padding: 5px 15px;
+    display: inline-block;
+    border-radius: 10px;
+    cursor: pointer;
   }
 }
 
