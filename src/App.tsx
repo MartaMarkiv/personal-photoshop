@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.scss";
 import { sendEditStabilityRequest } from "./api/requests";
 import ImageEditor from "./components/imageEditor/ImageEditor";
 import { Button, Flex } from "antd";
 import Loader from "./components/spinner/Loader";
+import useWidth from "./hooks/useWidth";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -17,17 +18,15 @@ function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  const windowWidth = useWidth();
+
   useEffect(() => {
     if (selectedImage && imgRef.current && canvasRef.current) {
-      console.log("In use effect");
       const img = imgRef.current;
       const canvas = canvasRef.current;
 
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
-
-      canvas.style.width = `${img.width}px`;
-      canvas.style.height = `${img.height}px`;
 
       const ctx = canvas.getContext("2d");
       if (ctx) {
@@ -38,6 +37,19 @@ function App() {
       ctxRef.current = ctx;
     }
   }, [selectedImage]);
+
+    const checkImageSize = useCallback(() => {
+    if (selectedImage && imgRef.current && canvasRef.current) {
+      const img = imgRef.current;
+      const canvas = canvasRef.current;
+      canvas.style.width = `${img.width}px`;
+      canvas.style.height = `${img.height}px`;
+    }
+  },[selectedImage]);
+
+  useEffect(() => {
+    checkImageSize();
+  }, [windowWidth, checkImageSize]);
 
   const handleMouseDown = () => setDrawing(true);
 
@@ -107,7 +119,6 @@ function App() {
 
   const uploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
-    console.log(fileList);
     if (fileList) {
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result as string);
