@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 function useWidth() {
   const [size, setSize] = useState<number>(0);
@@ -12,6 +12,6 @@ function useWidth() {
   }, []);
 
   return size;
-};
+}
 
 export default useWidth;

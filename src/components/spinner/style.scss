@@ -1,10 +1,6 @@
 @use "../../variables";
 
-.loader-container {
-  margin-left: 30px;
-
-  >span {
-    color: variables.$main-color;
-    margin-left: 10px;
-  }
+.loader-container > span {
+  color: variables.$main-color;
+  margin-left: 10px;
 }

@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import "./App.scss";
 import { sendEditStabilityRequest } from "./api/requests";
 import ImageEditor from "./components/imageEditor/ImageEditor";
-import { Button, Flex } from "antd";
+import { Button, Flex, notification } from "antd";
 import Loader from "./components/spinner/Loader";
 import useWidth from "./hooks/useWidth";
 
@@ -12,13 +18,16 @@ function App() {
   const [result, setResult] = useState<string | null>(null);
   const [drawing, setDrawing] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
+  const [resultIsReady, setResultIsReady] = useState<boolean>(false);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
+  const resultImgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const windowWidth = useWidth();
+  const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     if (selectedImage && imgRef.current && canvasRef.current) {
@@ -27,6 +36,9 @@ function App() {
 
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
+
+      canvas.style.width = `${img.width}px`;
+      canvas.style.height = `${img.height}px`;
 
       const ctx = canvas.getContext("2d");
       if (ctx) {
@@ -38,14 +50,14 @@ function App() {
     }
   }, [selectedImage]);
 
-    const checkImageSize = useCallback(() => {
+  const checkImageSize = useCallback(() => {
     if (selectedImage && imgRef.current && canvasRef.current) {
       const img = imgRef.current;
       const canvas = canvasRef.current;
       canvas.style.width = `${img.width}px`;
       canvas.style.height = `${img.height}px`;
     }
-  },[selectedImage]);
+  }, [selectedImage]);
 
   useEffect(() => {
     checkImageSize();
@@ -75,13 +87,8 @@ function App() {
   };
 
   const handleEdit = async () => {
-    if (!selectedImage || !canvasRef.current || !imageFile) return;
-
-    if (processing) {
-      setResult(null);
-      setSelectedImage(null);
+    if (!selectedImage || !canvasRef.current || !imageFile || processing)
       return;
-    }
 
     setProcessing(true);
 
@@ -101,33 +108,50 @@ function App() {
       const response = await sendEditStabilityRequest(formData);
 
       if (response.status !== 200) {
-        console.error(await response.text());
-        alert("Error from Stability API");
+        const errorData = await response.json();
+        openNotification(
+          errorData.errors[0] ||
+            "An unexpected error occurred. Please try again.",
+        );
         return;
       }
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       setResult(url);
+      setResultIsReady(true);
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500);
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      openNotification("Something went wrong");
     } finally {
       setProcessing(false);
     }
   };
 
+  const openNotification = (massage: string) => {
+    api.open({
+      message: "Notification",
+      description: massage,
+      showProgress: true,
+      pauseOnHover: true,
+    });
+  };
+
   const uploadImage = (event: ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
-    if (fileList) {
+    if (fileList && fileList.length) {
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result as string);
       reader.readAsDataURL(fileList[0]);
       setImageFile(fileList[0]);
       setResult(null);
-    } else {
-      setSelectedImage(null);
-      setImageFile(null);
+      setResultIsReady(false);
     }
   };
 
@@ -135,13 +159,15 @@ function App() {
     setSelectedImage(null);
     setResult(null);
     setImageFile(null);
-    if(inputRef.current) {
+    setResultIsReady(false);
+    if (inputRef.current) {
       inputRef.current.value = "";
     }
-  }
+  };
 
   return (
     <>
+      {contextHolder}
       <h1>Personal photoshop</h1>
       <div className="instructions-container">
         <h3>Follow instructions below:</h3>
@@ -152,16 +178,29 @@ function App() {
             picture.
           </li>
           <li>Press the 'Edit' button to see the result.</li>
+          <li>
+            If you are not satisfied with the result, you can Re-generate it
+            again.
+          </li>
         </ul>
+        <p className="notice-text">
+          {" "}
+          &#x26A0; Notice: You can send up to 5 edit requests.
+        </p>
       </div>
       <div className="image-input-container">
-      <input type="file" title="Upload an image"
+        <input
+          type="file"
+          title="Upload an image"
           onChange={uploadImage}
           ref={inputRef}
           className="image-input"
           id="imageInput"
-          accept="image/*" />
-          <label htmlFor="imageInput" className="image-input-label">+ Select image</label>
+          accept="image/*"
+        />
+        <label htmlFor="imageInput" className="image-input-label">
+          + Select image
+        </label>
       </div>
       {selectedImage && (
         <ImageEditor
@@ -177,7 +216,6 @@ function App() {
         <Button
           onClick={handleClearImage}
           disabled={!selectedImage || processing}
-          className="edit-button clear-button"
         >
           Clear image
         </Button>
@@ -186,17 +224,17 @@ function App() {
           disabled={!selectedImage || processing}
           className="edit-button"
         >
-          Edit
+          {resultIsReady ? "Regenerate" : "Edit"}
         </Button>
-        {
-          processing && <Loader />
-        }
+        {processing && <Loader />}
       </Flex>
       {result && (
-        <div className="result-container">
-          <h3>Result:</h3>
-          <img src={result} alt="Updated image" />
-        </div>
+        <>
+          <div className="result-container">
+            <h3>Result:</h3>
+            <img src={result} ref={resultImgRef} alt="Updated image" />
+          </div>
+        </>
       )}
     </>
   );

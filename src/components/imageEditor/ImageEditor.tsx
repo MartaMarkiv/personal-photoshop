@@ -1,3 +1,4 @@
+import { Flex, Image } from "antd";
 import "./style.scss";
 
 type ImageEditorProps = {
@@ -18,21 +19,27 @@ function ImageEditor({
   mouseUp,
 }: ImageEditorProps) {
   return (
-    <div className="image-edit-container">
-      <img
-        ref={imageRef}
-        src={imageUrl}
-        alt="Selected image"
-        className="selected-image"
-      />
-      <canvas
-        ref={maskRef}
-        className="masked-image"
-        onMouseDown={mouseDown}
-        onMouseUp={mouseUp}
-        onMouseMove={mouseMove}
-      />
-    </div>
+    <Flex className="image-edit-container" align="start">
+      <Flex className="original-image-wrapper" vertical={true}>
+        <p>Original image:</p>
+        <Image src={imageUrl} className="original-image" />
+      </Flex>
+      <div className="edit-image-wrapper">
+        <img
+          ref={imageRef}
+          src={imageUrl}
+          alt="Selected image"
+          className="selected-image"
+        />
+        <canvas
+          ref={maskRef}
+          className="masked-image"
+          onMouseDown={mouseDown}
+          onMouseUp={mouseUp}
+          onMouseMove={mouseMove}
+        />
+      </div>
+    </Flex>
   );
 }
 

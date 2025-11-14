@@ -9,44 +9,51 @@
 
 .instructions-container {
   text-align: left;
+
+  .notice-text {
+    &::first-letter {
+      font-size: 26px;
+      color: #ffc400;
+    }
+  }
 }
 
 .edit-btn-wrapper {
   text-align: left;
   margin-top: 30px;
-}
 
-.edit-button {
-  background-color: variables.$main-color;
-  font-size: 18px;
-  color: #ffffff;
-  text-transform: uppercase;
-  padding: 5px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
+  button {
+    background-color: variables.$main-color;
+    font-size: 18px;
+    color: #ffffff;
+    text-transform: uppercase;
+    padding: 5px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
 
-  &:disabled {
-    color: variables.$disabled-text;
-    background-color: variables.$disabled-bg;
-    cursor: default;
+    &:disabled {
+      color: variables.$disabled-text;
+      background-color: variables.$disabled-bg;
+      cursor: default;
+
+      &:hover {
+        color: variables.$disabled-text !important;
+        background-color: variables.$disabled-bg !important;
+        transform: none;
+      }
+    }
 
     &:hover {
-      color: variables.$disabled-text !important;
-      background-color: variables.$disabled-bg !important;
-      transform: none;
+      color: #fff !important;
+      background-color: variables.$color-hover !important;
+      transform: scale(1.05);
     }
   }
 
-  &:hover {
-    color: #fff !important;
-    background-color: variables.$color-hover !important;
-    transform: scale(1.05);
+  .edit-button {
+    margin: 0 20px;
   }
-}
-
-.clear-button {
-  margin-right: 20px;
 }
 
 .image-input-container {
@@ -68,10 +75,13 @@
 
 .result-container {
   margin-top: 30px;
+
+  img {
+    max-width: 100%;
+  }
 }
 
-
-@media(max-width: 410px) {
+@media (max-width: 410px) {
   body {
     min-width: 280px;
   }

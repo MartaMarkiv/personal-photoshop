@@ -1,6 +1,14 @@
 .image-edit-container {
-  position: relative;
   margin-top: 30px;
+
+  .edit-image-wrapper {
+    position: relative;
+  }
+
+  .original-image-wrapper {
+    max-width: 20%;
+    margin-right: 20px;
+  }
 
   .selected-image {
     max-width: 100%;
@@ -10,8 +18,29 @@
   .masked-image {
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     cursor: crosshair;
     opacity: 0.1;
+  }
+}
+
+@media (max-width: 800px) {
+  .image-edit-container {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+
+    .original-image-wrapper {
+      margin-bottom: 20px;
+      flex-direction: row;
+      align-items: center;
+      margin-right: 0;
+      max-width: none;
+
+      .ant-image {
+        max-width: 150px;
+        margin-left: 20px;
+      }
+    }
   }
 }
