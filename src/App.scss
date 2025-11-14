@@ -1,3 +1,5 @@
+@use "./variables";
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -15,7 +17,7 @@
 }
 
 .edit-button {
-  background-color: rgb(211, 104, 104);
+  background-color: variables.$main-color;
   font-size: 18px;
   color: #ffffff;
   text-transform: uppercase;
@@ -25,20 +27,20 @@
   cursor: pointer;
 
   &:disabled {
-    color: #d6d1d1;
-    background-color: rgb(198, 154, 154);
+    color: variables.$disabled-text;
+    background-color: variables.$disabled-bg;
     cursor: default;
 
     &:hover {
-      color: #d6d1d1 !important;
-      background-color: rgb(198, 154, 154) !important;
+      color: variables.$disabled-text !important;
+      background-color: variables.$disabled-bg !important;
       transform: none;
     }
   }
 
   &:hover {
     color: #fff !important;
-    background-color: rgb(239, 114, 114) !important;
+    background-color: variables.$color-hover !important;
     transform: scale(1.05);
   }
 }
@@ -55,7 +57,8 @@
   }
 
   .image-input-label {
-    border: 1px solid grey;
+    color: variables.$main-color;
+    border: 1px solid variables.$color-hover;
     padding: 5px 15px;
     display: inline-block;
     border-radius: 10px;

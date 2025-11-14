@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import "./App.scss";
 import { sendEditStabilityRequest } from "./api/requests";
 import ImageEditor from "./components/imageEditor/ImageEditor";
-import { Button } from "antd";
+import { Button, Flex } from "antd";
+import Loader from "./components/spinner/Loader";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -161,7 +162,7 @@ function App() {
           mouseUp={handleMouseUp}
         />
       )}
-      <div className="edit-btn-wrapper">
+      <Flex className="edit-btn-wrapper" align="center" justify="start">
         <Button
           onClick={handleClearImage}
           disabled={!selectedImage || processing}
@@ -176,7 +177,10 @@ function App() {
         >
           Edit
         </Button>
-      </div>
+        {
+          processing && <Loader />
+        }
+      </Flex>
       {result && (
         <div className="result-container">
           <h3>Result:</h3>
