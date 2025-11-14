@@ -38,6 +38,6 @@ Project includes:
 
   - This implementation uses Stability Inpainting API for image correction.
 
-  - Only 5 edit requests are allowed (per session).
+  - Only 4 edit requests are allowed (per session).
 
   - The project is available at https://personal-photoshop.vercel.app/

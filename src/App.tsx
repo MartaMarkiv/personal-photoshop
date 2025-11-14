@@ -184,8 +184,7 @@ function App() {
           </li>
         </ul>
         <p className="notice-text">
-          {" "}
-          &#x26A0; Notice: You can send up to 5 edit requests.
+          &#x26A0; Notice: You can send up to 4 edit requests.
         </p>
       </div>
       <div className="image-input-container">
